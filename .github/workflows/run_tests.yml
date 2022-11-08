@@ -294,13 +294,20 @@ jobs:
         # to avoid clashes on ECR
         REPO_PARSED=$(echo ${{ github.repository }} | awk '{print $1}' FS=/ | head -c 6)
         BRANCH_PARSED=$(echo ${{ github.ref }} | sed 's:refs/[a-z]*/::' | sed 's:[^a-zA-Z0-9]:-:g')
+        PROFILE="aws,test"
         if [[ "${{ github.repository }}" == "openproblems-bio/openproblems" ]]; then
           BRANCH=`echo $BRANCH_PARSED | head -c 40`
+          if [[ "${{ startsWith(github.ref, 'dev') }}" ]]; then
+            # full benchmark
+            PROFILE="aws"
+            echo "IGNORE_DOCKER_HASH='--ignore-docker-hash'" >> $GITHUB_ENV
+          fi
         else
           BRANCH="${REPO_PARSED}-`echo $BRANCH_PARSED | head -c 33`"
         fi
         BRANCH=`echo $BRANCH | sed 's/[^a-zA-Z0-9]*$//'`
         echo "BRANCH=${BRANCH}" >> $GITHUB_ENV
+        echo "PROFILE=${PROFILE}" >> $GITHUB_ENV
 
     - name: Cache Python packages
       uses: actions/cache@v3
@@ -417,16 +424,16 @@ jobs:
         RUN_NAME="$(echo "$BRANCH" | sed "s/[^a-zA-Z0-9]/_/g")_$(git rev-parse --short HEAD)_${GITHUB_RUN_ATTEMPT}"
         cd /mnt/openproblems-nextflow/cwd/${BRANCH}
         nextflow run \
-        -revision v1.8 \
+        -revision v1.9 \
         -with-tower \
         -ansi-log false -resume \
-        -profile aws,test \
+        -profile $PROFILE \
         -work-dir "/mnt/openproblems-nextflow/work/${BRANCH}" \
         -bucket-dir "s3://openproblems-nextflow/bucket/${BRANCH}" \
         -name "${RUN_NAME}" \
         -e.PYTHONPATH="${PYTHONPATH}" \
         openproblems-bio/nf-openproblems \
-        --branch ${BRANCH} | \
+        --branch ${BRANCH} ${IGNORE_DOCKER_HASH} |
         tee >(grep --color=never --line-buffered "Monitor the execution with Nextflow Tower using this url" >> $GITHUB_STEP_SUMMARY)
       shell: /bin/bash -eou pipefail {0}
 

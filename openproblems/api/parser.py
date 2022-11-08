@@ -118,6 +118,12 @@ def create_hash_parser(subparsers):
         help="Select functions from a specific task",
         required=True,
     )
+    parser.add_argument(
+        "--ignore-docker",
+        action="store_true",
+        default=False,
+        help="Ignore Docker image when determining computing hash",
+    )
     parse_function_type(parser)
     parser.add_argument("name", type=str, help="Name of the selected method")
 
