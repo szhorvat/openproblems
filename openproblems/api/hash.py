@@ -94,7 +94,7 @@ def docker_hash(image_name):
         return str(random.getrandbits(256))
 
 
-def get_context(obj, context=None, ignore_docker=False):
+def get_context(obj, context=None):
     """Return a dictionary describing the context of an object.
 
     Parameters
@@ -119,7 +119,7 @@ def get_context(obj, context=None, ignore_docker=False):
         if isinstance(obj, scprep.run.RFunction) and hasattr(obj, "__r_file__"):
             if obj.__r_file__ not in context:
                 context[obj.__r_file__] = git_hash(obj.__r_file__)
-        if hasattr(obj, "metadata") and "image" in obj.metadata and not ignore_docker:
+        if hasattr(obj, "metadata") and "image" in obj.metadata:
             image_name = f"singlecellopenproblems/{obj.metadata['image']}"
             if image_name not in context:
                 context[image_name] = docker_hash(image_name)
@@ -147,15 +147,22 @@ def hash_dict(context):
     return hash.hexdigest()
 
 
-def get_hash(task_name, function_type, function_name, ignore_docker=False):
+def get_hash(task_name, function_type, function_name, ignore_context=False):
     """Get the git commit hash associated with a function."""
-    fun = utils.get_function(task_name, function_type, function_name)
-    context = get_context(fun, ignore_docker=ignore_docker)
+    if ignore_context:
+        context = {
+            "task_name": task_name,
+            "function_type": function_type,
+            "function_name": function_name,
+        }
+    else:
+        fun = utils.get_function(task_name, function_type, function_name)
+        context = get_context(fun)
     hash = hash_dict(context)
     return hash
 
 
 def main(args):
     """Run the ``hash`` subcommand."""
-    hash = get_hash(args.task, args.function_type, args.name, args.ignore_docker)
+    hash = get_hash(args.task, args.function_type, args.name, args.ignore_context)
     return hash

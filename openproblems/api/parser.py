@@ -119,10 +119,12 @@ def create_hash_parser(subparsers):
         required=True,
     )
     parser.add_argument(
-        "--ignore-docker",
+        "--ignore-context",
         action="store_true",
         default=False,
-        help="Ignore Docker image when determining computing hash",
+        help="Ignore dependencies and module code when computing hash. "
+        "This computes the hash purely based off method names, meaning once defined, "
+        "a method will always have the same hash.",
     )
     parse_function_type(parser)
     parser.add_argument("name", type=str, help="Name of the selected method")

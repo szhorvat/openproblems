@@ -300,7 +300,7 @@ jobs:
           if [[ "${{ startsWith(github.ref, 'dev') }}" ]]; then
             # full benchmark
             PROFILE="aws"
-            echo "IGNORE_DOCKER_HASH='--ignore-docker-hash'" >> $GITHUB_ENV
+            echo "IGNORE_CONTEXT='--ignore-context'" >> $GITHUB_ENV
           fi
         else
           BRANCH="${REPO_PARSED}-`echo $BRANCH_PARSED | head -c 33`"
@@ -433,7 +433,7 @@ jobs:
         -name "${RUN_NAME}" \
         -e.PYTHONPATH="${PYTHONPATH}" \
         openproblems-bio/nf-openproblems \
-        --branch ${BRANCH} ${IGNORE_DOCKER_HASH} |
+        --branch ${BRANCH} ${IGNORE_CONTEXT} |
         tee >(grep --color=never --line-buffered "Monitor the execution with Nextflow Tower using this url" >> $GITHUB_STEP_SUMMARY)
       shell: /bin/bash -eou pipefail {0}
 
