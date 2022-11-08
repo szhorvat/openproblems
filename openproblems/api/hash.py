@@ -158,6 +158,7 @@ def get_hash(task_name, function_type, function_name, ignore_context=False):
     else:
         fun = utils.get_function(task_name, function_type, function_name)
         context = get_context(fun)
+    print(context)
     hash = hash_dict(context)
     return hash
 

@@ -2,6 +2,7 @@ from openproblems.api.hash import docker_labels_from_api
 from openproblems.api.main import main
 from openproblems.api.utils import print_output
 
+import hashlib
 import numpy as np
 import openproblems
 import os
@@ -144,6 +145,33 @@ def test_hash(task, function_type, function_name):
         ["hash", "--task", task, function_type, function_name],
         do_print=False,
     )
+    assert h1 == h2
+
+
+@parameterized.parameterized.expand(
+    [
+        ("label_projection", "--datasets", "pancreas_batch"),
+        ("multimodal_data_integration", "--methods", "mnn_log_scran_pooling"),
+    ],
+    name_func=utils.name.name_test,
+)
+def test_hash_ignore_context(task, function_type, function_name):
+    """Test git hash function."""
+    h1 = main(
+        ["hash", "--ignore-context", "--task", task, function_type, function_name],
+        do_print=False,
+    )
+
+    hash = hashlib.sha256()
+    context = {
+        "task_name": task,
+        "function_type": function_type.replace("--", "").upper(),
+        "function_name": function_name,
+    }
+    for key in sorted(context.keys()):
+        hash.update(bytes(key, encoding="utf-8"))
+        hash.update(bytes(context[key], encoding="utf-8"))
+    h2 = hash.hexdigest()
     assert h1 == h2
 
 
