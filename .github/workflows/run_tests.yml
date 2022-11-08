@@ -34,7 +34,10 @@ jobs:
       (
         startsWith(github.ref, 'refs/heads/test_docker') ||
         (
-          startsWith(github.ref, 'refs/heads/main') &&
+          (
+            startsWith(github.ref, 'refs/heads/main') ||
+            startsWith(github.ref, 'refs/heads/dev')
+          ) &&
           github.repository == 'openproblems-bio/openproblems'
         )
       )
@@ -454,6 +457,20 @@ jobs:
       with:
         name: nextflow.log
         path: /tmp/nextflow.log
+
+    - name: Create Pull Request
+      if: >-
+        startsWith(github.ref, 'refs/heads/dev') &&
+        github.repository == 'openproblems-bio/openproblems')
+      uses: peter-evans/create-pull-request@v4
+      with:
+        branch: dev
+        delete-branch: false
+        base: main
+        title: '[auto] Update from dev'
+        reviewers: scottgigante, LuckyMD
+        author: "openproblems-bio <singlecellopenproblems@protonmail.com>"
+        commit-message: "Update from dev # ci skip"
 
   run_full_benchmark:
     needs:
