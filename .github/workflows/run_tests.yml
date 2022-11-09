@@ -36,7 +36,7 @@ jobs:
         (
           (
             startsWith(github.ref, 'refs/heads/main') ||
-            startsWith(github.ref, 'refs/heads/devTMP')
+            startsWith(github.ref, 'refs/heads/dev')
           ) &&
           github.repository == 'openproblems-bio/openproblems'
         )
@@ -134,8 +134,7 @@ jobs:
       ) &&
       !startsWith(github.ref, 'refs/heads/test_docker') &&
       !startsWith(github.ref, 'refs/heads/test_benchmark') &&
-      !startsWith(github.ref, 'refs/heads/test_process') &&
-      !startsWith(github.ref, 'refs/heads/dev')
+      !startsWith(github.ref, 'refs/heads/test_process')
 
     steps:
     - name: Clear space on runner
@@ -226,8 +225,7 @@ jobs:
       github.event_name == 'push' &&
       (
         needs.run_tester.result == 'success' ||
-        startsWith(github.ref, 'refs/heads/test_benchmark') ||
-        startsWith(github.ref, 'refs/heads/dev')
+        startsWith(github.ref, 'refs/heads/test_benchmark')
       )
 
     steps:
