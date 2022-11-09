@@ -461,7 +461,7 @@ jobs:
     - name: Create Pull Request
       if: >-
         startsWith(github.ref, 'refs/heads/dev') &&
-        github.repository == 'openproblems-bio/openproblems')
+        github.repository == 'openproblems-bio/openproblems'
       uses: peter-evans/create-pull-request@v4
       with:
         branch: dev
