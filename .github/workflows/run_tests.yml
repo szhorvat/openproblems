@@ -305,7 +305,7 @@ jobs:
           if [[ "${{ startsWith(github.ref, 'dev') }}" ]]; then
             # full benchmark
             PROFILE="aws"
-            echo "IGNORE_CONTEXT='--ignore-context'" >> $GITHUB_ENV
+            echo "IGNORE_CONTEXT=--ignore-context" >> $GITHUB_ENV
           fi
         else
           BRANCH="${REPO_PARSED}-`echo $BRANCH_PARSED | head -c 33`"
