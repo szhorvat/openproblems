@@ -88,7 +88,7 @@ jobs:
       with:
         branch: ${{ env.BRANCH_NAME }}
         delete-branch: true
-        base: main
+        base: dev
         title: '[auto] Update docker version'
         reviewers: scottgigante, dburkhardt
         author: "openproblems-bio <singlecellopenproblems@protonmail.com>"

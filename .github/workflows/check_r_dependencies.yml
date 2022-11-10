@@ -49,7 +49,7 @@ jobs:
       with:
         branch: ${{ env.UPDATE_BRANCH_NAME }}
         delete-branch: true
-        base: main
+        base: dev
         labels: dependencies,r
         title: "Update ${{ env.PKG_CHANGED }}"
         committer: "openproblems-bio <singlecellopenproblems@protonmail.com>"
