@@ -416,6 +416,7 @@ jobs:
         done
 
     - name: Run test benchmark
+      id: run_benchmark
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -432,6 +433,7 @@ jobs:
           cd /mnt/openproblems-nextflow/cwd/${BRANCH}
           WORKDIR="/mnt/openproblems-nextflow/work/${BRANCH}"
         fi
+        echo "::set-output name=cwd::$(pwd)"
         nextflow run \
         -revision v1.9 \
         -with-tower \
@@ -444,17 +446,18 @@ jobs:
         openproblems-bio/nf-openproblems \
         --branch ${BRANCH} ${IGNORE_CONTEXT} |
         tee >(grep --color=never --line-buffered "Monitor the execution with Nextflow Tower using this url" >> $GITHUB_STEP_SUMMARY)
+
       shell: /bin/bash -eou pipefail {0}
 
     - name: Parse results
       run: |
-        python workflow/parse_nextflow.py /mnt/openproblems-nextflow/cwd/${BRANCH} /tmp/website
+        python workflow/parse_nextflow.py ${{ steps.run_benchmark.outputs.cwd }} /tmp/website
         python workflow/generate_website_markdown.py /tmp/website
 
     - name: Rename nextflow log
       if: always()
       run: |
-        mv /mnt/openproblems-nextflow/cwd/${{ env.BRANCH }}/.nextflow.log /tmp/nextflow.log
+        cp ${{ steps.run_benchmark.outputs.cwd }}/.nextflow.log /tmp/nextflow.log
       continue-on-error: true
 
     - name: Upload nextflow log
